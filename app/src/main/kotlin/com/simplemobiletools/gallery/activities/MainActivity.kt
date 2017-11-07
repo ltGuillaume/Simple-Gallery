@@ -94,7 +94,7 @@ class MainActivity : SimpleActivity(), DirectoryAdapter.DirOperationsListener {
             menuInflater.inflate(R.menu.menu_main_intent, menu)
         } else {
             menuInflater.inflate(R.menu.menu_main, menu)
-            menu.findItem(R.id.increase_column_count).isVisible = config.viewTypeFolders == VIEW_TYPE_GRID && config.dirColumnCnt < 10
+            menu.findItem(R.id.increase_column_count).isVisible = config.viewTypeFolders == VIEW_TYPE_GRID && config.dirColumnCnt < MAX_COLUMN_COUNT
             menu.findItem(R.id.reduce_column_count).isVisible = config.viewTypeFolders == VIEW_TYPE_GRID && config.dirColumnCnt > 1
         }
         menu.findItem(R.id.temporarily_show_hidden).isVisible = !config.shouldShowHidden
@@ -343,7 +343,7 @@ class MainActivity : SimpleActivity(), DirectoryAdapter.DirOperationsListener {
             }
 
             override fun zoomOut() {
-                if (layoutManager.spanCount < 10) {
+                if (layoutManager.spanCount < MAX_COLUMN_COUNT) {
                     increaseColumnCount()
                     getRecyclerAdapter().actMode?.finish()
                 }
@@ -470,6 +470,7 @@ class MainActivity : SimpleActivity(), DirectoryAdapter.DirOperationsListener {
             clipData.addItem(ClipData.Item(it))
         }
 
+        resultIntent.flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
         resultIntent.clipData = clipData
     }
 
@@ -478,7 +479,7 @@ class MainActivity : SimpleActivity(), DirectoryAdapter.DirOperationsListener {
         val uri = getFilePublicUri(File(path), BuildConfig.APPLICATION_ID)
         val type = path.getMimeTypeFromPath()
         resultIntent.setDataAndTypeAndNormalize(uri, type)
-        resultIntent.flags = Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION
+        resultIntent.flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
     }
 
     private fun itemClicked(path: String) {
